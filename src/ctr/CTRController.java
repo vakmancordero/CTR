@@ -1,9 +1,6 @@
 package ctr;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URL;
-import java.text.DecimalFormat;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -24,48 +21,9 @@ public class CTRController implements Initializable {
     @FXML
     private ComboBox<String> operationCB, methodCB;
     
-    private int k;
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.initCB();
-        this.k = 5;
-    }
-    
-    private String toScientificNotation(double value) {
-        
-        String format = "0."; for (int i = 0; i < this.k; i++) format += "#"; format += "E0";
-        
-        DecimalFormat decimalFormat = new DecimalFormat(format);
-        
-        return decimalFormat.format(value);
-        
-    }
-    
-    private double truncate(double value) {
-        
-        double toReturn = new BigDecimal(
-                String.valueOf(value)
-        ).setScale(
-                this.k, RoundingMode.DOWN
-        ).stripTrailingZeros().doubleValue();
-        
-        return toReturn;
-        
-    }
-    
-    private double round(double value) {
-        
-        double result = value;
-        double entero = Math.floor(value);
-        
-        result = (result - entero) * Math.pow(10, this.k);
-        
-        result = Math.round(result);
-        
-        result = (result / Math.pow(10, this.k)) + entero;
-        
-        return result;
     }
     
     private void initCB() {
@@ -90,103 +48,182 @@ public class CTRController implements Initializable {
     @FXML
     private void calculate() {
         
-        String kSt = this.kTF.getText();
-        
-        if (!kSt.isEmpty()) {
+        if (check(kTF, operationCB, methodCB, firstTF, secondTF)) {
             
-            this.k = Integer.parseInt(kSt);
+            String operation = getValue(operationCB).toString();
+            
+            String method = getValue(methodCB).toString();
+            
+            int k = Integer.parseInt(getValue(kTF).toString());
+
+            double first = Double.parseDouble(getValue(secondTF).toString());
+            double second = Double.parseDouble(getValue(firstTF).toString());
+            
+            Result result = this.operate(first, second, operation, method, k);
+
+            new Alert(
+                    Alert.AlertType.INFORMATION, 
+                    "El resultado real es: " + result.getReal() + 
+                    "\n\nEl resultado no real es: " + result.getNoReal(),
+                    ButtonType.OK
+            ).showAndWait();
+            
+            new Alert(
+                    Alert.AlertType.INFORMATION, 
+                    "Error absoluto: " + result.getAbsoluteError() + 
+                    "\n\nError relativo: " + result.getRelativeError(),
+                    ButtonType.OK
+            ).showAndWait();
+            
+            
+        } else {
+            
+            new Alert(
+                    Alert.AlertType.ERROR, 
+                    "Complete los campos faltantes", 
+                    ButtonType.OK
+            ).show();
             
         }
         
-        String operation = this.operationCB.getSelectionModel().getSelectedItem();
-        String method = this.methodCB.getSelectionModel().getSelectedItem();
+    }
+    
+    private Result operate(double first, double second, String operation, String method, int k) {
         
-        double first = Double.parseDouble(firstTF.getText());
-        double second = Double.parseDouble(secondTF.getText());
+        Result result = new Result();
         
-        double no_real = 0;
-        double real = 0;
-        
-        switch (operation.toLowerCase()) {
+        ConvertAndOperate co_op = new ConvertAndOperate(k);
             
+        switch (operation.toLowerCase()) {
+
             case "suma":
                 
-                real = first + second;
+                result.setReal(first + second);
                 
-                if (method.equalsIgnoreCase("truncamiento")) {
-                    
-                    no_real = truncate(truncate(first) + truncate(second));
-                    
-                } else {
-                    
-                    no_real = truncate(round(first) + round(second));
-                    
-                }
+                if (method.equalsIgnoreCase("truncamiento"))
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.truncate(first) + co_op.truncate(second) 
+                            )
+                    );
+                else 
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.round(first) + co_op.round(second) 
+                            )
+                    );
                 
                 break;
-                
+
             case "resta":
                 
-                real = first - second;
-                
-                if (method.equalsIgnoreCase("truncamiento")) {
-                    
-                    no_real = truncate(truncate(first) - truncate(second));
-                    
-                } else {
-                    
-                    no_real = truncate(round(first) - round(second));
-                    
-                }
+                if (method.equalsIgnoreCase("truncamiento"))
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.truncate(first) - co_op.truncate(second) 
+                            )
+                    );
+                else 
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.round(first) - co_op.round(second) 
+                            )
+                    );
                 
                 break;
-                
+
             case "multiplicacion":
                 
-                real = first * second;
-                
-                if (method.equalsIgnoreCase("truncamiento")) {
-                    
-                    no_real = truncate(truncate(first) * truncate(second));
-                    
-                } else {
-                    
-                    no_real = truncate(round(first) * round(second));
-                    
-                }
+                if (method.equalsIgnoreCase("truncamiento"))
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.truncate(first) * co_op.truncate(second) 
+                            )
+                    );
+                else 
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.round(first) * co_op.round(second) 
+                            )
+                    );
                 
                 break;
-            
+
             case "division":
                 
-                real = first / second;
-                
-                if (method.equalsIgnoreCase("truncamiento")) {
-                    
-                    no_real = truncate(truncate(first) / truncate(second));
-                    
-                } else {
-                    
-                    no_real = truncate(round(first) / round(second));
-                    
-                }
+                if (method.equalsIgnoreCase("truncamiento"))
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.truncate(first) / co_op.truncate(second) 
+                            )
+                    );
+                else 
+                    result.setNoReal(
+                            co_op.truncate(
+                                    co_op.round(first) / co_op.round(second) 
+                            )
+                    );
                 
                 break;
+
             default:
-                System.out.println("Opcion inválida");
+
+                System.out.println("try again..");
         }
         
-        double error_abosluto = Math.abs(real - no_real);
-        double error_relativo = error_abosluto / Math.abs(real);
+        return result;
         
-        new Alert(
-                Alert.AlertType.INFORMATION, 
-                "El resultado real es: " + real + 
-                "\nEl resultado no real es: " + no_real + 
-                "\nError absoluto: " + (error_abosluto) + 
-                "\nError relativo: " + (error_relativo),
-                ButtonType.OK
-        ).showAndWait();
+    }
+    
+    private boolean check(Object... controls) {
+        
+        for (Object control : controls) {
+            
+            String className = control.getClass().getSimpleName();
+            
+            if (className.equals("TextField")) {
+                
+                if (((TextField)control).getText().isEmpty()) {
+                    return false;
+                }
+                
+            } else if (className.equals("ComboBox")) {
+                
+                if (((ComboBox)control).getSelectionModel().getSelectedIndex() == -1) {
+                    return false;
+                }
+
+            } else if (true) {
+                
+                System.out.println("Another control");
+                
+            }
+            
+        }
+        
+        return true;
+        
+    }
+    
+    private Object getValue(Object control) {
+        
+        String className = control.getClass().getSimpleName();
+        
+        if (className.equals("TextField")) {
+            
+            return ((TextField)control).getText();
+            
+        } else if (className.equals("ComboBox")) {
+            
+            return ((ComboBox<String>)control).getSelectionModel().getSelectedItem();
+            
+        } else if (true) {
+            
+            System.out.println("Another control");
+            
+        }
+        
+        return null;
         
     }
     
