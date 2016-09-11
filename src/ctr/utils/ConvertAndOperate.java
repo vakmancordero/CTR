@@ -1,4 +1,4 @@
-package ctr;
+package ctr.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,6 +11,9 @@ import java.text.DecimalFormat;
 public class ConvertAndOperate {
     
     private int k;
+
+    public ConvertAndOperate() {
+    }
     
     public ConvertAndOperate(int k) {
         this.k = k;
@@ -26,23 +29,33 @@ public class ConvertAndOperate {
     
     public String toScientificNotation(double value) {
         
-        String format = "0."; for (int i = 0; i < this.k; i++) format += "#"; format += "E0";
+        String myFormat = "0."; for (int i = 0; i < this.k; i++) myFormat += "#"; myFormat += "E0";
         
-        DecimalFormat decimalFormat = new DecimalFormat(format);
+        String[] splited = new DecimalFormat(myFormat).format(value).split("E");
         
-        return decimalFormat.format(value);
+        String result = splited[0]; String exponent = splited[1];
+        
+        //String addition = "•10";
+        String addition = "x10";
+        
+        if (exponent.length() > 1) {
+            
+            addition += "<sup>" 
+                            + exponent.substring(1, exponent.length())
+                     +  "<sup>";
+        }
+        
+        return result + addition;
         
     }
     
     public double truncate(double value) {
         
-        double toReturn = new BigDecimal(
+        return new BigDecimal(
                 String.valueOf(value)
         ).setScale(
                 this.k, RoundingMode.DOWN
         ).stripTrailingZeros().doubleValue();
-        
-        return toReturn;
         
     }
     

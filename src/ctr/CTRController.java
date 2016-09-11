@@ -1,5 +1,8 @@
 package ctr;
 
+import ctr.utils.ConvertAndOperate;
+import ctr.utils.Result;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
@@ -21,9 +24,12 @@ public class CTRController implements Initializable {
     @FXML
     private ComboBox<String> operationCB, methodCB;
     
+    private ConvertAndOperate co_op;
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         this.initCB();
+        this.co_op = new ConvertAndOperate();
     }
     
     private void initCB() {
@@ -70,8 +76,12 @@ public class CTRController implements Initializable {
             
             new Alert(
                     Alert.AlertType.INFORMATION, 
-                    "Error absoluto: " + result.getAbsoluteError() + 
-                    "\n\nError relativo: " + result.getRelativeError(),
+                    "Error absoluto: " + co_op.toScientificNotation(
+                            result.getAbsoluteError().doubleValue()
+                    ) + 
+                    "\n\nError relativo: " + co_op.toScientificNotation(
+                            result.getRelativeErr().doubleValue()
+                    ),
                     ButtonType.OK
             ).showAndWait();
             
@@ -92,77 +102,61 @@ public class CTRController implements Initializable {
         
         Result result = new Result();
         
-        ConvertAndOperate co_op = new ConvertAndOperate(k);
-            
+        co_op.setK(k);
+        
         switch (operation.toLowerCase()) {
-
+            
             case "suma":
                 
-                result.setReal(first + second);
+                result.setReal(BigDecimal.valueOf(first + second));
                 
                 if (method.equalsIgnoreCase("truncamiento"))
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.truncate(first) + co_op.truncate(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.truncate(first) + co_op.truncate(second)) 
+                    ));
                 else 
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.round(first) + co_op.round(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.round(first) + co_op.round(second)) 
+                    ));
                 
                 break;
 
             case "resta":
                 
                 if (method.equalsIgnoreCase("truncamiento"))
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.truncate(first) - co_op.truncate(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.truncate(first) - co_op.truncate(second)) 
+                    ));
                 else 
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.round(first) - co_op.round(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.round(first) - co_op.round(second)) 
+                    ));
                 
                 break;
 
             case "multiplicacion":
                 
                 if (method.equalsIgnoreCase("truncamiento"))
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.truncate(first) * co_op.truncate(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.truncate(first) * co_op.truncate(second)) 
+                    ));
                 else 
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.round(first) * co_op.round(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.round(first) * co_op.round(second)) 
+                    ));
                 
                 break;
 
             case "division":
                 
                 if (method.equalsIgnoreCase("truncamiento"))
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.truncate(first) / co_op.truncate(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.truncate(first) / co_op.truncate(second)) 
+                    ));
                 else 
-                    result.setNoReal(
-                            co_op.truncate(
-                                    co_op.round(first) / co_op.round(second) 
-                            )
-                    );
+                    result.setNoReal((
+                            BigDecimal.valueOf(co_op.round(first) / co_op.round(second)) 
+                    ));
                 
                 break;
 
