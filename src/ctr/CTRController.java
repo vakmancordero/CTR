@@ -25,9 +25,6 @@ public class CTRController implements Initializable {
     @FXML
     private ComboBox<String> operationCB, methodCB;
     
-    @FXML
-    private Label label;
-    
     private ConvertAndOperate co_op;
     
     @Override
@@ -70,7 +67,7 @@ public class CTRController implements Initializable {
             double second = Double.parseDouble(getValue(firstTF).toString());
             
             Result result = this.operate(first, second, operation, method, k);
-
+            
             new Alert(
                     Alert.AlertType.INFORMATION, 
                     "El resultado real es: " + result.getReal() + 
@@ -78,17 +75,23 @@ public class CTRController implements Initializable {
                     ButtonType.OK
             ).showAndWait();
             
-            new Alert(
-                    Alert.AlertType.INFORMATION, 
-                    "Error absoluto: " + co_op.toScientificNotation(
-                            result.getAbsoluteError().doubleValue()
-                    ) + 
-                    "\n\nError relativo: " + co_op.toScientificNotation(
-                            result.getRelativeErr().doubleValue()
-                    ),
-                    ButtonType.OK
-            ).showAndWait();
-            
+            try {
+                
+                new Alert(
+                        Alert.AlertType.INFORMATION, 
+                        "Error absoluto: " + co_op.toScientificNotation(
+                                result.getAbsoluteError().doubleValue()
+                        ) + 
+                        "\n\nError relativo: " + co_op.toScientificNotation(
+                                result.getRelativeErr().doubleValue()
+                        ),
+                        ButtonType.OK
+                ).showAndWait();
+                
+            } catch (NumberFormatException ex) {
+                
+                new Alert(Alert.AlertType.ERROR, "Sin resultados", ButtonType.OK).showAndWait();
+            }
             
         } else {
             
@@ -127,6 +130,8 @@ public class CTRController implements Initializable {
 
             case "resta":
                 
+                result.setReal(BigDecimal.valueOf(first - second));
+                
                 if (method.equalsIgnoreCase("truncamiento"))
                     result.setNoReal((
                             BigDecimal.valueOf(co_op.truncate(first) - co_op.truncate(second)) 
@@ -140,6 +145,8 @@ public class CTRController implements Initializable {
 
             case "multiplicacion":
                 
+                result.setReal(BigDecimal.valueOf(first * second));
+                
                 if (method.equalsIgnoreCase("truncamiento"))
                     result.setNoReal((
                             BigDecimal.valueOf(co_op.truncate(first) * co_op.truncate(second)) 
@@ -152,6 +159,8 @@ public class CTRController implements Initializable {
                 break;
 
             case "division":
+                
+                result.setReal(BigDecimal.valueOf(first / second));
                 
                 if (method.equalsIgnoreCase("truncamiento"))
                     result.setNoReal((
