@@ -33,19 +33,7 @@ public class ConvertAndOperate {
         
         String[] splited = new DecimalFormat(myFormat).format(value).split("E");
         
-        String result = splited[0]; String exponent = splited[1];
-        
-        //String addition = "•10";
-        String addition = "x10";
-        
-        if (exponent.length() > 1) {
-            
-            addition += "<sup>" 
-                            + exponent.substring(1, exponent.length())
-                     +  "<sup>";
-        }
-        
-        return result + addition;
+        return splited[0] + "x10^" + splited[1];
         
     }
     

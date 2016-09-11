@@ -10,6 +10,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 /**
@@ -23,6 +24,9 @@ public class CTRController implements Initializable {
     
     @FXML
     private ComboBox<String> operationCB, methodCB;
+    
+    @FXML
+    private Label label;
     
     private ConvertAndOperate co_op;
     
