@@ -4,17 +4,15 @@ import ctr.utils.ConvertAndOperate;
 import ctr.utils.Result;
 import java.math.BigDecimal;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.ParseException;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 /**
  *
@@ -34,11 +32,7 @@ public class CTRController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.initCB();
         this.co_op = new ConvertAndOperate();
-        
-        DecimalFormat decimalFormat = new DecimalFormat("0.########E0");
-            
-        System.out.println(0.111111E-4 / 3E-5);
-    }
+   }
     
     private void initCB() {
         
@@ -86,6 +80,18 @@ public class CTRController implements Initializable {
                     ButtonType.OK
             ).showAndWait();
             
+            /*
+            if (this.setClipboard(result.getReal().toString())) {
+                
+                new Alert(
+                        Alert.AlertType.INFORMATION, 
+                        "Se ha copiado el valor real de la "
+                      + "operación al portapapeles",
+                        ButtonType.OK
+                ).showAndWait();
+                
+            }
+            
             try {
                 
                 new Alert(
@@ -103,6 +109,7 @@ public class CTRController implements Initializable {
                 
                 new Alert(Alert.AlertType.ERROR, "Sin resultados", ButtonType.OK).showAndWait();
             }
+            */
             
         } else {
             
@@ -197,6 +204,17 @@ public class CTRController implements Initializable {
         }
         
         return result;
+        
+    }
+    
+    private boolean setClipboard(String text) {
+        
+        Clipboard clipboard = Clipboard.getSystemClipboard();
+        
+        ClipboardContent content = new ClipboardContent();
+        content.putString(text);
+        
+        return clipboard.setContent(content);
         
     }
     
