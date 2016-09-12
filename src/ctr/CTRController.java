@@ -91,7 +91,8 @@ public class CTRController implements Initializable {
                 ).showAndWait();
                 
             }
-            
+            */            
+
             try {
                 
                 new Alert(
@@ -109,7 +110,6 @@ public class CTRController implements Initializable {
                 
                 new Alert(Alert.AlertType.ERROR, "Sin resultados", ButtonType.OK).showAndWait();
             }
-            */
             
         } else {
             
