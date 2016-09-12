@@ -40,7 +40,7 @@ public class Result {
     } 
     
     public BigDecimal getRelativeErr() {
-        return BigDecimal.valueOf(getAbsoluteError().doubleValue() / real.doubleValue());
+        return BigDecimal.valueOf(getAbsoluteError().doubleValue() / real.doubleValue()).abs();
     }
     
 }

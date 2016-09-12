@@ -4,13 +4,16 @@ import ctr.utils.ConvertAndOperate;
 import ctr.utils.Result;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 /**
@@ -31,6 +34,10 @@ public class CTRController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         this.initCB();
         this.co_op = new ConvertAndOperate();
+        
+        DecimalFormat decimalFormat = new DecimalFormat("0.########E0");
+            
+        System.out.println(0.111111E-4 / 3E-5);
     }
     
     private void initCB() {
@@ -63,15 +70,19 @@ public class CTRController implements Initializable {
             
             int k = Integer.parseInt(getValue(kTF).toString());
 
-            double first = Double.parseDouble(getValue(secondTF).toString());
-            double second = Double.parseDouble(getValue(firstTF).toString());
+            double first = Double.parseDouble(getValue(firstTF).toString());
+            double second = Double.parseDouble(getValue(secondTF).toString());
             
             Result result = this.operate(first, second, operation, method, k);
             
             new Alert(
                     Alert.AlertType.INFORMATION, 
-                    "El resultado real es: " + result.getReal() + 
-                    "\n\nEl resultado no real es: " + result.getNoReal(),
+                    "El resultado real es: " + co_op.toScientificNotation(
+                            result.getReal().doubleValue()
+                    ) + 
+                    "\n\nEl resultado no real es: " + co_op.toScientificNotation(
+                            result.getNoReal().doubleValue()
+                    ),
                     ButtonType.OK
             ).showAndWait();
             
@@ -111,6 +122,8 @@ public class CTRController implements Initializable {
         
         co_op.setK(k);
         
+        System.out.println(operation.toLowerCase());
+        
         switch (operation.toLowerCase()) {
             
             case "suma":
@@ -129,6 +142,9 @@ public class CTRController implements Initializable {
                 break;
 
             case "resta":
+                
+                System.out.println(first);
+                System.out.println(second);
                 
                 result.setReal(BigDecimal.valueOf(first - second));
                 
@@ -159,6 +175,8 @@ public class CTRController implements Initializable {
                 break;
 
             case "division":
+                
+                System.out.println(first  + "/" + second);
                 
                 result.setReal(BigDecimal.valueOf(first / second));
                 
